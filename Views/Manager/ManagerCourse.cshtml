@@ -1,0 +1,163 @@
+﻿@model IEnumerable<ManagerStudent.Models.Course>
+
+@{
+    ViewData["Title"] = "Course Management";
+}
+
+<!-- Header -->
+<header class="bg-primary text-white p-3 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+        <h3 class="m-0">SIMS Management</h3>
+    </div>
+</header>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar (Left Menu) -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Academic</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Report</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-4">
+            
+            <!-- Course List -->
+            <table class="table table-bordered mt-4">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Credit Hours</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var course in Model)
+                    {
+                        <tr>
+                            <td>@course.CourseId</td>
+                            <td>@course.CourseName</td>
+                            <td>@course.Description</td>
+                            <td>@course.CreditHours</td>
+                            <td>@course.StartDate.ToShortDateString()</td>
+                            <td>@course.EndDate.ToShortDateString()</td>
+                            <td>
+                                <button class="btn btn-warning" onclick="editCourse(@course.CourseId, '@course.CourseName', '@course.Description', @course.CreditHours, '@course.StartDate.ToString("yyyy-MM-dd")', '@course.EndDate.ToString("yyyy-MM-dd")')">Edit</button>
+
+                                <form asp-action="DeleteCourse" method="post" style="display:inline;">
+                                    <input type="hidden" name="id" value="@course.CourseId" />
+                                    <input type="submit" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this?');" />
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <hr />
+            <div class="container-fluid mt-3 px-0">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <form id="courseForm" asp-action="SaveCourse" method="post" onsubmit="validateForm(event)" class="w-100">
+                            <input type="hidden" id="CourseId" name="CourseId" />
+
+                            <div class="row">
+                                <div class="col-lg-6 mb-3">
+                                    <label class="form-label">Course Name</label>
+                                    <input type="text" id="CourseName" name="CourseName" class="form-control w-100" required />
+                                </div>
+
+                                <div class="col-lg-6 mb-3">
+                                    <label class="form-label">Credit Hours</label>
+                                    <input type="number" id="CreditHours" name="CreditHours" class="form-control w-100" required />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea id="Description" name="Description" class="form-control w-100"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6 mb-3">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" id="StartDate" name="StartDate" class="form-control w-100" required />
+                                </div>
+
+                                <div class="col-lg-6 mb-3">
+                                    <label class="form-label">End Date</label>
+                                    <input type="date" id="EndDate" name="EndDate" class="form-control w-100" required />
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success w-100">Add Course</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+           
+        </main>
+    </div>
+</div>
+
+
+<script>
+    function logInput(field, value) {
+        console.log(field + ": " + value);
+    }
+
+    function validateForm(event) {
+        let courseName = document.getElementById("CourseName").value;
+        let creditHours = document.getElementById("CreditHours").value;
+        let startDate = document.getElementById("StartDate").value;
+        let endDate = document.getElementById("EndDate").value;
+
+        if (!courseName || !creditHours || !startDate || !endDate) {
+            console.error("⚠️ Invalid data! Please check the required fields.");
+            alert("Please fill in all the information!");
+            event.preventDefault();
+        } else {
+            console.log("✅ Data valid! Submitting to server...");
+        }
+    }
+
+    function editCourse(id, name, desc, credits, start, end) {
+        document.getElementById("CourseId").value = id;
+        document.getElementById("CourseName").value = name;
+        document.getElementById("Description").value = desc;
+        document.getElementById("CreditHours").value = credits;
+        document.getElementById("StartDate").value = start;
+        document.getElementById("EndDate").value = end;
+
+        document.getElementById("submitButton").innerText = "Save";
+    }
+</script>
+
+<!-- Bootstrap 5 JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
